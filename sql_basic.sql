@@ -30,7 +30,7 @@ SELECT
 FROM
     countries
 WHERE
-    population > 100000
+    population >= 100000
 ;
 -- 問5
 -- 平均寿命が56歳から76歳の国をすべて抽出してください。
@@ -184,7 +184,7 @@ WHERE
     life_expectancy
 ORDER BY
     life_expectancy DESC,
-    indep_year
+    indep_year DESC
 ;
 
 -- 問19
@@ -291,19 +291,50 @@ FROM
 -- 全ての有名人の名前,国名、第一言語を出力してください。
 SELECT
     celebrities.name,
-    c.name,
-    cl.language
+    countries.name,
+    countrylanguages.language
 FROM
     celebrities
     LEFT JOIN
-        countries c
-    ON  celebrities.country_code = c.code
+        countries
+    ON  celebrities.country_code = countries.code
     LEFT JOIN
-        countrylanguages cl
-    ON  celebrities.country_code = cl.country_code
+        countrylanguages
+    ON  celebrities.country_code = countrylanguages.country_code
 WHERE
-    cl.is_official = 'T'
+    countrylanguages.percentage = (
+        SELECT
+            MAX(cl.percentage)
+        FROM
+            countrylanguages cl
+        WHERE
+            cl.country_code = countries.code
+    )
 ;
+
+
+
+-- SELECT
+--     ce.name AS celebrity_name,
+--     co.name AS country_name,
+--     cl.language AS first_language
+-- FROM
+--     celebrities ce
+-- JOIN
+--     countries co
+-- ON
+--     ce.country_code = co.code
+-- JOIN
+--     countrylanguages cl
+-- ON
+--     co.code = cl.country_code
+-- LEFT JOIN
+--     countrylanguages cl2
+-- ON
+--     co.code = cl2.country_code AND cl.percentage < cl2.percentage
+-- WHERE
+--     cl2.language IS NULL;
+
 
 -- 問29
 -- 全ての有名人の名前と国名をに出力してください。 ただしテーブル結合せずサブクエリを使用してください。
